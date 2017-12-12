@@ -1,0 +1,61 @@
+{
+  "name": "rate-limit-memcached",
+  "description": "",
+  "version": "0.1.0",
+  "author": "linyows",
+  "license": "MIT",
+  "repository": "linyows/rate-limit-memcached",
+  "homepage": "https://github.com/linyows/rate-limit-memcached",
+  "keywords": [
+    "express",
+    "api",
+    "memcached",
+    "rate-limit"
+  ],
+  "bugs": "https://github.com/linyows/rate-limit-memcached/issues",
+  "main": "./index.js",
+  "types": "./lib/types.d.ts",
+  "files": [
+    "MIT-LICENSE",
+    "README.md",
+    "index.js",
+    "lib/"
+  ],
+  "directories": {
+    "lib": "./lib",
+    "src": "./src"
+  },
+  "dependencies": {
+    "memcached": "^2.2.2"
+  },
+  "devDependencies": {
+    "@types/memcached": "^2.2.4",
+    "@types/node": "^8.0.32",
+    "ava": "^0.22.0",
+    "nsp": "^2.8.1",
+    "coveralls": "^3.0.0",
+    "nyc": "^11.2.1",
+    "tslint": "^5.7.0",
+    "tslint-microsoft-contrib": "^5.0.1",
+    "typescript": "^2.5.3"
+  },
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "ava": {
+    "files": [
+      "./lib/**/*.test.js"
+    ]
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf lib",
+    "ci": "npm install && npm run lint && npm run cov && nsp check",
+    "test": "npm run build && ava -v",
+    "cov": "npm run build && nyc ava",
+    "lint": "tslint -p tsconfig.json -c tslint.json src/**/*.ts",
+    "preversion": "npm run clean && npm run build && npm test",
+    "postversion": "git push origin --tags",
+    "prepublishOnly": "npm run clean && npm run build && npm test"
+  }
+}
