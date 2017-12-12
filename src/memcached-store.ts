@@ -11,10 +11,12 @@ export default class MemcachedStore {
   public expiration: number
   public client: any
 
-  constructor(options: IMemcachedStoreOptions) {
-    this.prefix = options.prefix || 'rl:'
-    this.expiration = options.expiration || 60 * 15
-    this.client = options.client || new Memcached(['127.0.0.1:11211'])
+  constructor(options?: IMemcachedStoreOptions) {
+    const minutes = 15
+    const seconds = 60
+    this.expiration = options !== undefined && options.expiration !== undefined ? options.expiration : minutes * seconds
+    this.prefix = options !== undefined && options.prefix !== undefined ? options.prefix : 'rl:'
+    this.client = options !== undefined && options.client !== undefined ? options.client : new Memcached(['127.0.0.1:11211'])
   }
 
   public incr(key: string, cb: any): void {
