@@ -1,7 +1,7 @@
 import * as Memcached from 'memcached'
 
 export interface IMemcachedStoreOptions {
-  expiration: number,
+  expiration?: number,
   prefix?: string,
   client?: any,
 }
