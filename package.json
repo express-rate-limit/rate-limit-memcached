@@ -1,7 +1,7 @@
 {
   "name": "rate-limit-memcached",
   "description": "",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "linyows",
   "license": "MIT",
   "repository": "linyows/rate-limit-memcached",
