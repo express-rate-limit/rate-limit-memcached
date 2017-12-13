@@ -37,6 +37,12 @@ export default class MemcachedStore {
     })
   }
 
+  public decrement(key: string): void {
+    this.client.decrement(`${this.prefix}${key}`, 1, (err: any, result: boolean|number) => {
+      return { err, result }
+    })
+  }
+
   public resetKey(key: string): void {
     this.client.del(`${this.prefix}${key}`)
   }
