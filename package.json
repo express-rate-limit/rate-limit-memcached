@@ -14,7 +14,7 @@
   ],
   "bugs": "https://github.com/linyows/rate-limit-memcached/issues",
   "main": "./index.js",
-  "types": "./lib/types.d.ts",
+  "types": "./lib/memcached-store.d.ts",
   "files": [
     "MIT-LICENSE",
     "README.md",
