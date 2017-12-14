@@ -46,8 +46,4 @@ export default class MemcachedStore {
   public resetKey(key: string): void {
     this.client.del(`${this.prefix}${key}`)
   }
-
-  public resetAll(): void {
-    this.client.del(`${this.prefix}`)
-  }
 }
