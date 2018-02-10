@@ -58,8 +58,5 @@
     "preversion": "npm run clean && npm run build && npm test",
     "postversion": "git push origin --tags",
     "prepublishOnly": "npm run clean && npm run build && npm test"
-  },
-  "optionalDependencies": {
-    "fsevents": "^1.1.3"
   }
 }
