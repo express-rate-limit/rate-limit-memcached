@@ -51,7 +51,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf lib",
-    "ci": "npm install --no-optional && npm list --depth 0 && npm run lint && npm run cov && nsp check",
+    "ci": "npm install && npm run lint && npm run cov && nsp check",
     "test": "npm run build && ava -v",
     "cov": "npm run build && nyc ava",
     "lint": "tslint -p tsconfig.json -c tslint.json src/**/*.ts",
