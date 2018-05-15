@@ -1,6 +1,8 @@
 Rate Limit Memcached
 ====================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/linyows/rate-limit-memcached.svg)](https://greenkeeper.io/)
+
 Memcached client for the [express-rate-limit](https://github.com/nfriedly/express-rate-limit) middleware.
 
 <a href="https://www.npmjs.com/package/rate-limit-memcached" title="npm"><img src="http://img.shields.io/npm/v/rate-limit-memcached.svg?style=flat-square"></a>
