@@ -31,13 +31,13 @@
   "devDependencies": {
     "@types/memcached": "^2.2.4",
     "@types/node": "^8.0.32",
-    "ava": "^0.22.0",
-    "nsp": "^2.8.1",
+    "ava": "^0.25.0",
+    "nsp": "^3.2.1",
     "coveralls": "^3.0.0",
-    "nyc": "^11.2.1",
+    "nyc": "^13.1.0",
     "tslint": "^5.7.0",
     "tslint-microsoft-contrib": "^5.0.1",
-    "typescript": "~2.6.2",
+    "typescript": "~3.1.6",
     "testdouble": "^3.2.6"
   },
   "engines": {
