@@ -30,30 +30,39 @@
   },
   "devDependencies": {
     "@types/memcached": "^2.2.4",
-    "@types/node": "^8.0.32",
-    "ava": "^0.22.0",
-    "nsp": "^2.8.1",
+    "@types/node": "^10.12.18",
+    "ava": "^1.0.1",
+    "ava-ts": "^0.25.0",
     "coveralls": "^3.0.0",
-    "nyc": "^11.2.1",
-    "tslint": "^5.7.0",
-    "tslint-microsoft-contrib": "^5.0.1",
-    "typescript": "~2.6.2",
-    "testdouble": "^3.2.6"
+    "nyc": "^12.0.1",
+    "testdouble": "^3.9.2",
+    "ts-node": "^7.0.0",
+    "tslint": "^5.10.0",
+    "tslint-microsoft-contrib": "^6.0.0",
+    "typescript": "~2.8.3"
   },
   "engines": {
     "node": ">=8.9.0"
   },
   "ava": {
     "files": [
-      "./lib/**/*.test.js"
+      "src/**/*.test.ts"
+    ]
+  },
+  "nyc": {
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "src/**/*.test.ts"
     ]
   },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf lib",
-    "ci": "npm install && npm run lint && npm run cov && nsp check",
-    "test": "npm run build && ava -v",
-    "cov": "npm run build && nyc ava",
+    "ci": "npm i && npm run lint && npm run cov && npm audit",
+    "test": "ava-ts -v",
+    "cov": "nyc ava-ts",
     "lint": "tslint -p tsconfig.json -c tslint.json src/**/*.ts",
     "preversion": "npm run clean && npm run build && npm test",
     "postversion": "git push origin --tags",

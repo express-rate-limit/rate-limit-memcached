@@ -23,12 +23,12 @@ Test('.constructor sets members when gave arguments', (t) => {
 
 Test('#incr calls client.increment and client.set when at first time', (t) => {
   const memcached = TD.constructor(Memcached)
-  TD.when(memcached.prototype.increment('rl:key', 1, TD.callback(null, false))).thenReturn()
-  TD.when(memcached.prototype.set('rl:key', 15 * 60, 1, TD.callback(null, true))).thenReturn()
+  TD.when(memcached.prototype.increment('rl:key', 1, TD.callback(undefined, false))).thenReturn()
+  TD.when(memcached.prototype.set('rl:key', 15 * 60, 1, TD.callback(undefined, true))).thenReturn()
   const client = new memcached
   const m = new MemcachedStore({ client })
   m.incr('key', (err: any, num: number) => {
-    t.is(err, null)
+    t.is(err, undefined)
     t.is(num, 1)
   })
   t.is(TD.explain(memcached.prototype.increment).callCount, 1)
@@ -37,11 +37,11 @@ Test('#incr calls client.increment and client.set when at first time', (t) => {
 
 Test('#incr calls client.increment when after the second time', (t) => {
   const memcached = TD.constructor(Memcached)
-  TD.when(memcached.prototype.increment('rl:key', 1, TD.callback(null, 2))).thenReturn()
+  TD.when(memcached.prototype.increment('rl:key', 1, TD.callback(undefined, 2))).thenReturn()
   const client = new memcached
   const m = new MemcachedStore({ client })
   m.incr('key', (err: any, num: number) => {
-    t.is(err, null)
+    t.is(err, undefined)
     t.is(num, 2)
   })
   t.is(TD.explain(memcached.prototype.increment).callCount, 1)
