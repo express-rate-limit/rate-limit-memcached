@@ -3,10 +3,10 @@ Rate Limit Memcached
 
 Memcached client for the [express-rate-limit](https://github.com/nfriedly/express-rate-limit) middleware.
 
-<a href="https://www.npmjs.com/package/rate-limit-memcached" title="npm"><img src="http://img.shields.io/npm/v/rate-limit-memcached.svg?style=flat-square"></a>
-<a href="https://travis-ci.org/linyows/rate-limit-memcached" title="travis"><img src="https://img.shields.io/travis/linyows/rate-limit-memcached.svg?style=flat-square"></a>
-<a href="https://coveralls.io/github/linyows/rate-limit-memcached" title="coveralls"><img src="https://img.shields.io/coveralls/linyows/rate-limit-memcached.svg?style=flat-square"></a>
-<a href="https://github.com/linyows/rate-limit-memcached/blob/master/MIT-LICENSE" title="MIT License"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square"></a>
+<a href="https://www.npmjs.com/package/rate-limit-memcached" title="npm"><img src="http://img.shields.io/npm/v/rate-limit-memcached.svg?style=for-the-badge"></a>
+<a href="https://travis-ci.org/linyows/rate-limit-memcached" title="travis"><img src="https://img.shields.io/travis/linyows/rate-limit-memcached.svg?style=for-the-badge"></a>
+<a href="https://coveralls.io/github/linyows/rate-limit-memcached" title="coveralls"><img src="https://img.shields.io/coveralls/linyows/rate-limit-memcached.svg?style=for-the-badge"></a>
+<a href="https://github.com/linyows/rate-limit-memcached/blob/master/MIT-LICENSE" title="MIT License"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge"></a>
 
 Installation
 ------------

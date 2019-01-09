@@ -21,18 +21,18 @@ export default class MemcachedStore {
 
   public incr(key: string, cb: any): void {
     this.client.increment(`${this.prefix}${key}`, 1, (err: any, result: boolean|number) => {
-      if (err) { return cb(err, null) }
+      if (err) { return cb(err, undefined) }
 
       if (result === false) {
         this.client.set(`${this.prefix}${key}`, 1, this.expiration, (ng: any, ok: boolean) => {
           if (ok === true) {
-            cb(null, 1)
+            cb(undefined, 1)
           } else {
-            cb(ng, null)
+            cb(ng, undefined)
           }
         })
       } else {
-        cb(null, result)
+        cb(undefined, result)
       }
     })
   }
