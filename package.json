@@ -31,10 +31,9 @@
   "devDependencies": {
     "@types/memcached": "^2.2.4",
     "@types/node": "^10.12.18",
-    "ava": "^1.0.1",
-    "ava-ts": "^0.25.0",
-    "coveralls": "^3.0.0",
-    "nyc": "^13.3.0",
+    "ava": "^1.4.1",
+    "codecov": "^3.2.0",
+    "nyc": "^14.1.0",
     "testdouble": "^3.9.2",
     "ts-node": "^7.0.0",
     "tslint": "^5.10.0",
@@ -45,6 +44,13 @@
     "node": ">=8.9.0"
   },
   "ava": {
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
     "files": [
       "src/**/*.test.ts"
     ]
@@ -61,8 +67,9 @@
     "build": "tsc",
     "clean": "rm -rf lib",
     "ci": "npm i && npm run lint && npm run cov && npm audit",
-    "test": "ava-ts -v",
-    "cov": "nyc ava-ts",
+    "test": "ava -v",
+    "cov": "nyc ava",
+    "cov:report": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "lint": "tslint -p tsconfig.json -c tslint.json src/**/*.ts",
     "preversion": "npm run clean && npm run build && npm test",
     "postversion": "git push origin --tags",
