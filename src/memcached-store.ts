@@ -20,7 +20,7 @@ export default class MemcachedStore {
   }
 
   public incr(key: string, cb: any): void {
-    this.client.increment(`${this.prefix}${key}`, 1, (err: any, result: boolean|number) => {
+    this.client.incr(`${this.prefix}${key}`, 1, (err: any, result: boolean|number) => {
       if (err) { return cb(err, undefined) }
 
       if (result === false) {
@@ -38,7 +38,7 @@ export default class MemcachedStore {
   }
 
   public decrement(key: string): void {
-    this.client.decrement(`${this.prefix}${key}`, 1, (err: any, result: boolean|number) => {
+    this.client.decr(`${this.prefix}${key}`, 1, (err: any, result: boolean|number) => {
       return { err, result }
     })
   }
