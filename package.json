@@ -49,7 +49,7 @@
 		"format:code": "xo --fix",
 		"format:rest": "prettier --ignore-path .gitignore --ignore-unknown --write .",
 		"format": "run-s format:*",
-		"test:lib": "cross-env NODE_NO_WARNINGS=1 NODE_OPTIONS=--experimental-vm-modules jest",
+		"test:lib": "cross-env NODE_NO_WARNINGS=1 NODE_OPTIONS=--experimental-vm-modules jest --config config/jest.json",
 		"test": "run-s lint test:lib",
 		"pre-commit": "lint-staged",
 		"prepare": "run-s compile && husky install config/husky"
@@ -59,6 +59,8 @@
 		"memcached": "2.2.2"
 	},
 	"devDependencies": {
+		"@express-rate-limit/prettier": "1.0.0",
+		"@express-rate-limit/tsconfig": "1.0.0",
 		"@jest/globals": "29.6.2",
 		"@types/jest": "29.5.3",
 		"@types/node": "20.5.0",
@@ -82,36 +84,7 @@
 	"xo": {
 		"prettier": true
 	},
-	"prettier": {
-		"semi": false,
-		"useTabs": true,
-		"singleQuote": true,
-		"bracketSpacing": true,
-		"trailingComma": "all",
-		"proseWrap": "always"
-	},
-	"jest": {
-		"verbose": true,
-		"preset": "ts-jest/presets/default-esm",
-		"collectCoverage": true,
-		"collectCoverageFrom": [
-			"source/**/*.ts"
-		],
-		"testTimeout": 30000,
-		"testMatch": [
-			"**/test/**/*-test.[jt]s?(x)"
-		],
-		"moduleFileExtensions": [
-			"js",
-			"jsx",
-			"json",
-			"ts",
-			"tsx"
-		],
-		"moduleNameMapper": {
-			"^(\\.{1,2}/.*)\\.js$": "$1"
-		}
-	},
+	"prettier": "@express-rate-limit/prettier",
 	"lint-staged": {
 		"{source,test}/**/*.ts": "xo --fix",
 		"**/*.{json,yaml,md}": "prettier --ignore-path .gitignore --ignore-unknown --write "
