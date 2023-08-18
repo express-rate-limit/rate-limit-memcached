@@ -41,7 +41,17 @@ class MemcachedStore implements Store {
 	 */
 	constructor(options?: Partial<Options>) {
 		this.prefix = options?.prefix ?? 'rl:'
-		this.client = options?.client ?? new Memcached(['127.0.0.1:11211'])
+
+		if (options?.client) {
+			if (
+				typeof options.client.get === 'function' &&
+				typeof options.client.add === 'function' &&
+				typeof options.client.replace === 'function' &&
+				typeof options.client.del === 'function'
+			)
+				this.client = options.client
+			else throw new Error('An invalid memcached client was passed to store.')
+		} else this.client = new Memcached(['127.0.0.1:11211'])
 	}
 
 	/**
@@ -99,9 +109,14 @@ class MemcachedStore implements Store {
 		const prefixedKey = this.prefixKey(key)
 
 		// Delete the record for that key.
-		await new Promise<void>((_, reject) => {
+		await new Promise<void>((resolve, reject) => {
 			this.client.del(prefixedKey, (error) => {
-				if (error) reject(error)
+				if (error) {
+					reject(error)
+					return
+				}
+
+				resolve()
 			})
 		})
 	}
