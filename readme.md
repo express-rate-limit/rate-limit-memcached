@@ -94,7 +94,6 @@ Defaults to [`new Memcached()`](https://github.com/3rd-Eden/memcached).
 If you encounter a bug or want to see something added/changed, please go ahead
 and
 [open an issue](https://github.com/express-rate-limitedly/rate-limit-memcached/issues/new)!
-[open an issue](https://github.com/express-rate-limitedly/rate-limit-memcached/issues/new)!
 If you need help with something, feel free to
 [start a discussion](https://github.com/express-rate-limit/rate-limit-memcached/discussions/new)!
 
