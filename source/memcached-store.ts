@@ -1,4 +1,4 @@
-// /source/store.ts
+// /source/memcached-store.ts
 // A `memcached` store for the `express-rate-limit` middleware.
 
 import type {
