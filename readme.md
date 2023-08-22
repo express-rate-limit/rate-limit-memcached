@@ -57,7 +57,7 @@ const limiter = rateLimit({
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
 	store: new MemcachedStore({
 		// prefix: 'rl:', // The prefix attached to all keys stored in the cache.
-		// client: new Memcached(['foo.bar', 'localhost:11211']) // The memcached client to use.
+		locations: ['foo.bar', 'localhost:11211'], // The server location(s), passed directly to Memcached.
 	}),
 })
 
