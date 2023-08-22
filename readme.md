@@ -82,12 +82,34 @@ Defaults to `rl:`.
 The client used to make requests to the Memcached server. Must have the
 following methods:
 
-- `get: (string, callback)`
-- `add: (string, any, number, callback)`
-- `replace: (string, any, number, callback)`
-- `del: (string, callback)`
+- `get: (key, callback)`
+- `add: (key, value, lifetime, callback)`
+- `replace: (key, value, lifetime, callback)`
+- `del: (key, callback)`
+
+> Here, `key` is a string, `value` is a number, and `lifetime` is the time in
+> seconds until it expires.
 
 Defaults to [`new Memcached()`](https://github.com/3rd-Eden/memcached).
+
+### `locations`
+
+A list of memcached servers to store the keys in, passed to the default
+Memcached client created by calling
+[`new Memcached()`](https://github.com/3rd-Eden/memcached).
+
+Note that the default client is only used if an alternative `client` is not
+passed to the store.
+
+Defaults to `['localhost:11211']`.
+
+### `config`
+
+> `object`
+
+The configuration passed to the default Memcached client.
+
+Defaults to `{}`.
 
 ## Issues and Contributing
 

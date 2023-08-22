@@ -51,7 +51,11 @@ class MemcachedStore implements Store {
 			)
 				this.client = options.client
 			else throw new Error('An invalid memcached client was passed to store.')
-		} else this.client = new Memcached(['127.0.0.1:11211'])
+		} else
+			this.client = new Memcached(
+				options?.locations ?? ['localhost:11211'],
+				options?.config ?? {},
+			)
 	}
 
 	/**

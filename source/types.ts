@@ -1,6 +1,8 @@
 // /source/types.ts
 // The type definitions for this package.
 
+import type Memcached from 'memcached'
+
 /**
  * A memcached client.
  */
@@ -34,4 +36,18 @@ export type Options = {
 	 * The `memcached` client to use.
 	 */
 	client: MemcachedClient
+
+	/**
+	 * A list of memcached server URLs to store the keys in, passed to the default
+	 * memcached client.
+	 *
+	 * Note that the default client is only used if another client is not passed
+	 * to the store.
+	 */
+	locations: string[]
+
+	/**
+	 * The configuration to pass to the default client, along with the `locations`.
+	 */
+	config: Memcached.options
 }
