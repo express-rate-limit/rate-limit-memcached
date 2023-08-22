@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright 2017 linyows
+Copyright 2023 Tomohisa Oda, Nathan Friedly, and Vedant K
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
