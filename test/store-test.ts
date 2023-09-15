@@ -24,8 +24,9 @@ const getStore = async (): Promise<MemcachedStore> => {
 
 	// Spy on all the functions so we can make sure they are called.
 	jest.spyOn(client, 'get')
-	jest.spyOn(client, 'add')
-	jest.spyOn(client, 'replace')
+	jest.spyOn(client, 'set')
+	jest.spyOn(client, 'incr')
+	jest.spyOn(client, 'decr')
 	jest.spyOn(client, 'del')
 
 	// Create an new store and initialise it.
@@ -42,8 +43,8 @@ it('should work when `increment` is called for new key', async () => {
 	expect(data.totalHits).toBe(1)
 	expect(data.resetTime instanceof Date).toBe(true)
 
-	expect(store.client.get).toHaveBeenCalled()
-	expect(store.client.add).toHaveBeenCalled()
+	expect(store.client.incr).toHaveBeenCalled()
+	expect(store.client.set).toHaveBeenCalledTimes(2)
 })
 
 it('should work when `increment` is called for existing key', async () => {
@@ -58,13 +59,12 @@ it('should work when `increment` is called for existing key', async () => {
 	expect(data.resetTime instanceof Date).toBe(true)
 })
 
-it('should do nothing when `decrement` is called for new key', async () => {
+it('should still call `decr` when `decrement` is called for non-existent key', async () => {
 	const store = await getStore()
 
 	await store.decrement('1.2.3.4')
 
-	expect(store.client.get).toHaveBeenCalled()
-	expect(store.client.add).not.toHaveBeenCalled()
+	expect(store.client.decr).toHaveBeenCalled()
 })
 
 it('should work when `decrement` is called for existing key', async () => {
@@ -73,9 +73,7 @@ it('should work when `decrement` is called for existing key', async () => {
 	await store.increment('1.2.3.4')
 	await store.decrement('1.2.3.4')
 
-	expect(store.client.get).toHaveBeenCalledTimes(2)
-	expect(store.client.add).toHaveBeenCalled()
-	expect(store.client.replace).toHaveBeenCalled()
+	expect(store.client.decr).toHaveBeenCalled()
 })
 
 it('should work when `resetKey` is called for existing key', async () => {
@@ -84,9 +82,7 @@ it('should work when `resetKey` is called for existing key', async () => {
 	await store.increment('1.2.3.4')
 	await store.resetKey('1.2.3.4')
 
-	expect(store.client.get).toHaveBeenCalled()
-	expect(store.client.add).toHaveBeenCalled()
-	expect(store.client.del).toHaveBeenCalled()
+	expect(store.client.del).toHaveBeenCalledTimes(2) // Once for the key, once for the `key__expiry`.
 })
 
 it('should still call `del` when `resetKey` is called for non-existent key', async () => {
@@ -94,5 +90,5 @@ it('should still call `del` when `resetKey` is called for non-existent key', asy
 
 	await store.resetKey('1.2.3.4')
 
-	expect(store.client.del).toHaveBeenCalled()
+	expect(store.client.del).toHaveBeenCalledTimes(2)
 })

@@ -1,6 +1,7 @@
 // /source/memcached-store.ts
 // A `memcached` store for the `express-rate-limit` middleware.
 
+import { promisify } from 'node:util'
 import type {
 	Store,
 	Options as RateLimitConfiguration,
@@ -8,11 +9,6 @@ import type {
 } from 'express-rate-limit'
 import Memcached from 'memcached'
 import type { Options, MemcachedClient } from './types'
-
-/**
- * The hit count and start window timestamp of a client.
- */
-type ClientRecord = { hits: number; time: number } // [in milliseconds]
 
 /**
  * A `Store` for the `express-rate-limit` package that stores hit counts in
@@ -45,9 +41,10 @@ class MemcachedStore implements Store {
 		if (options?.client) {
 			if (
 				typeof options.client.get === 'function' &&
-				typeof options.client.add === 'function' &&
-				typeof options.client.replace === 'function' &&
-				typeof options.client.del === 'function'
+				typeof options.client.set === 'function' &&
+				typeof options.client.del === 'function' &&
+				typeof options.client.incr === 'function' &&
+				typeof options.client.decr === 'function'
 			)
 				this.client = options.client
 			else throw new Error('An invalid memcached client was passed to store.')
@@ -81,6 +78,18 @@ class MemcachedStore implements Store {
 	}
 
 	/**
+	 * Method to suffix the keys with `__expiry`, which is the name of the key used
+	 * to store the reset timestamp for that key.
+	 *
+	 * @param key {string} - The key.
+	 *
+	 * @returns {string} - The key + '__expiry'.
+	 */
+	expirySuffix(key: string): string {
+		return `${key}__expiry`
+	}
+
+	/**
 	 * Method to increment a client's hit counter.
 	 *
 	 * @param key {string} - The identifier for a client.
@@ -88,11 +97,46 @@ class MemcachedStore implements Store {
 	 * @returns {IncrementResponse} - The number of hits and reset time for that client.
 	 */
 	async increment(key: string): Promise<IncrementResponse> {
-		const response = (await this.updateKey(
-			this.prefixKey(key),
-			+1,
-		)) as IncrementResponse // We can cast this for sure because we're passing delta as +1
-		return response
+		const prefixedKey = this.prefixKey(key)
+		const getKey = promisify(this.client.get).bind(this.client)
+		const setKey = promisify(this.client.set).bind(this.client)
+		const incrementKey = promisify(this.client.incr).bind(this.client)
+
+		// Try incrementing the given key. If the key exists, it will increment it
+		// and return the updated hit count.
+		// @ts-expect-error `incrementKey` returns a number or a boolean, not void.
+		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+		let totalHits = (await incrementKey(prefixedKey, 1)) as number | boolean
+		let expiresAt
+
+		if (totalHits === false) {
+			// The increment command failed since the key does not exist. In which case, set the
+			// hit count for that key to 1, and make sure it expires after `window` seconds.
+			await setKey(prefixedKey, 1, this.expiration)
+			totalHits = 1 // When you set it to 1, it returns `true` for some reason.
+
+			// Also store the expiration time in a separate key.
+			expiresAt = Date.now() + this.expiration
+			await setKey(
+				this.expirySuffix(prefixedKey), // The name of the key.
+				expiresAt, // The value - the time at which the key expires.
+				this.expiration, // The key should be deleted by memcached after `window` seconds.
+			)
+		} else {
+			// If the key exists and has been incremented succesfully, retrieve its expiry.
+			expiresAt = (await getKey(this.expirySuffix(prefixedKey))) as number
+		}
+
+		if (typeof totalHits !== 'number')
+			throw new Error(
+				`Expected 'totalHits' to be a number, got ${totalHits} instead.`,
+			)
+
+		// Return the total number of hits, as well as the reset timestamp.
+		return {
+			totalHits,
+			resetTime: expiresAt === undefined ? undefined : new Date(expiresAt),
+		}
 	}
 
 	/**
@@ -101,7 +145,11 @@ class MemcachedStore implements Store {
 	 * @param key {string} - The identifier for a client
 	 */
 	async decrement(key: string): Promise<void> {
-		await this.updateKey(this.prefixKey(key), -1)
+		const prefixedKey = this.prefixKey(key)
+		const decrementKey = promisify(this.client.decr).bind(this.client)
+
+		// Decrement the key, and do nothing if it doesn't exist.
+		await decrementKey(prefixedKey, 1)
 	}
 
 	/**
@@ -111,82 +159,11 @@ class MemcachedStore implements Store {
 	 */
 	async resetKey(key: string): Promise<void> {
 		const prefixedKey = this.prefixKey(key)
+		const deleteKey = promisify(this.client.del).bind(this.client)
 
-		// Delete the record for that key.
-		await new Promise<void>((resolve, reject) => {
-			this.client.del(prefixedKey, (error) => {
-				if (error) {
-					reject(error)
-					return
-				}
-
-				resolve()
-			})
-		})
-	}
-
-	private async updateKey(
-		key: string,
-		delta: number,
-	): Promise<IncrementResponse | void> {
-		// Find the existing record for that key.
-		let record = await new Promise<ClientRecord>((resolve, reject) => {
-			this.client.get(key, (error, data) => {
-				if (error) {
-					reject(error)
-					return
-				}
-
-				resolve(data as ClientRecord)
-			})
-		})
-
-		if (record === undefined && delta < 0) {
-			// If the record does not exist, and we are supposed to decrement the key,
-			// we don't need to do anything, so we return.
-			return
-		}
-
-		if (record === undefined) {
-			// If a record does not exist, and must be incremented, then add a record
-			// for that key.
-			record = await new Promise<ClientRecord>((resolve, reject) => {
-				const payload: ClientRecord = { hits: 1, time: Date.now() }
-
-				this.client.add(key, payload, this.expiration, (error) => {
-					if (error) {
-						reject(error)
-						return
-					}
-
-					resolve(payload)
-				})
-			})
-		} else {
-			// If it does exist, simply change the hit count by `delta`.
-			record = await new Promise<ClientRecord>((resolve, reject) => {
-				const payload: ClientRecord = { ...record, hits: record.hits + delta }
-				const expiration = Math.floor(
-					// = window - (time elapsed since start of window) [in seconds]
-					this.expiration - (Date.now() - payload.time) / 1000,
-				)
-
-				this.client.replace(key, payload, expiration, (error) => {
-					if (error) {
-						reject(error)
-						return
-					}
-
-					resolve(payload)
-				})
-			})
-		}
-
-		// Return the total number of hits and the time left for the window to reset.
-		return {
-			totalHits: record.hits,
-			resetTime: new Date(record.time + this.expiration * 1000),
-		}
+		// Delete the the key, as well as its expiration counterpart.
+		await deleteKey(prefixedKey)
+		await deleteKey(this.expirySuffix(prefixedKey))
 	}
 }
 
