@@ -25,6 +25,7 @@ const getStore = async (): Promise<MemcachedStore> => {
 	// Spy on all the functions so we can make sure they are called.
 	jest.spyOn(client, 'get')
 	jest.spyOn(client, 'set')
+	jest.spyOn(client, 'add')
 	jest.spyOn(client, 'incr')
 	jest.spyOn(client, 'decr')
 	jest.spyOn(client, 'del')
@@ -44,7 +45,7 @@ it('should work when `increment` is called for new key', async () => {
 	expect(data.resetTime instanceof Date).toBe(true)
 
 	expect(store.client.incr).toHaveBeenCalled()
-	expect(store.client.set).toHaveBeenCalledTimes(2)
+	expect(store.client.add).toHaveBeenCalledTimes(2)
 })
 
 it('should work when `increment` is called for existing key', async () => {

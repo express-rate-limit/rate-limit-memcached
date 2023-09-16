@@ -24,10 +24,10 @@ const methods: Array<keyof MemcachedClient> = [
  * The promisifed version of the `MemcachedClient`.
  */
 type PromisifiedMemcachedClient = {
-	get: <T>(key: string) => Promise<T>
-	set: (key: string, value: any, time: number) => Promise<boolean>
-	add: (key: string, value: any, time: number) => Promise<boolean>
-	del: (key: string) => Promise<boolean>
+	get: <T>(key: string) => Promise<T | undefined>
+	set: (key: string, value: any, time: number) => Promise<boolean | undefined>
+	add: (key: string, value: any, time: number) => Promise<boolean | undefined>
+	del: (key: string) => Promise<boolean | undefined>
 	incr: (key: string, amount: number) => Promise<boolean | number>
 	decr: (key: string, amount: number) => Promise<boolean | number>
 }
@@ -140,21 +140,31 @@ class MemcachedStore implements Store {
 		if (totalHits === false) {
 			// The increment command failed since the key does not exist. In which case, set the
 			// hit count for that key to 1, and make sure it expires after `window` seconds.
-			await this.fns.set(prefixedKey, 1, this.expiration)
-			totalHits = 1 // When you set it to 1, it returns `true` for some reason.
+			const response = await this.fns.add(prefixedKey, 1, this.expiration)
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
+			if (response === undefined || response === false) {
+				// The key was created sometime in between, call `increment` again.
+				totalHits = await this.fns.incr(prefixedKey, 1)
+				// Then fetch its expiry time.
+				expiresAt = await this.fns.get<number>(this.expiryKey(key))
+			} else {
+				// If it is added successfully, set `totalHits` to 1.
+				totalHits = 1
 
-			// Also store the expiration time in a separate key.
-			expiresAt = Date.now() + this.expiration * 1000 // [seconds -> milliseconds]
-			await this.fns.set(
-				this.expiryKey(key), // The name of the key.
-				expiresAt, // The value - the time at which the key expires.
-				this.expiration, // The key should be deleted by memcached after `window` seconds.
-			)
+				// Also store the expiration time in a separate key.
+				expiresAt = Date.now() + this.expiration * 1000 // [seconds -> milliseconds]
+				await this.fns.add(
+					this.expiryKey(key), // The name of the key.
+					expiresAt, // The value - the time at which the key expires.
+					this.expiration, // The key should be deleted by memcached after `window` seconds.
+				)
+			}
 		} else {
 			// If the key exists and has been incremented succesfully, retrieve its expiry.
 			expiresAt = await this.fns.get<number>(this.expiryKey(key))
 		}
 
+		// Make sure `totalHits` is a number.
 		if (typeof totalHits !== 'number')
 			throw new Error(
 				`Expected 'totalHits' to be a number, got ${totalHits} instead.`,
