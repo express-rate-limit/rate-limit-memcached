@@ -33,14 +33,9 @@ From Github Releases:
 ```
 
 Replace `{version}` with the version of the package that you want to your, e.g.:
-`2.0.0`.
+`1.0.0`.
 
 ## Usage
-
-> This package, from version `2.0.0` onwards, is a
-> [pure `esm` package](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c).
-> This means you cannot `require` it in `cjs` projects anymore. Please see the
-> linked article for more information.
 
 **This package requires you to use Node 16 or above.**
 
@@ -57,7 +52,7 @@ const limiter = rateLimit({
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
 	store: new MemcachedStore({
 		// prefix: 'rl:', // The prefix attached to all keys stored in the cache.
-		locations: ['foo.bar', 'localhost:11211'], // The server location(s), passed directly to Memcached.
+		locations: ['localhost:11211'], // The server location(s), passed directly to Memcached.
 	}),
 })
 
@@ -83,14 +78,18 @@ The client used to make requests to the Memcached server. Must have the
 following methods:
 
 - `get: (key, callback)`
-- `add: (key, value, lifetime, callback)`
-- `replace: (key, value, lifetime, callback)`
 - `del: (key, callback)`
+- `set: (key, value, lifetime, callback)`
+- `add: (key, value, lifetime, callback)`
+- `incr: (key, delta, callback)`
+- `decr: (key, delta, callback)`
 
-> Here, `key` is a string, `value` is a number, and `lifetime` is the time in
-> seconds until it expires.
+> Here, `key` is a string, `value` and `delta` are numbers, and `lifetime` is
+> the time in seconds until it expires.
 
-Defaults to [`new Memcached()`](https://github.com/3rd-Eden/memcached).
+Defaults to an instance of [`memcached`](https://github.com/3rd-Eden/memcached),
+created with the `locations` and `config` options (see below for details) passed
+to it.
 
 ### `locations`
 
