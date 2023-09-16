@@ -144,7 +144,7 @@ class MemcachedStore implements Store {
 			totalHits = 1 // When you set it to 1, it returns `true` for some reason.
 
 			// Also store the expiration time in a separate key.
-			expiresAt = Date.now() + this.expiration
+			expiresAt = Date.now() + this.expiration * 1000 // [seconds -> milliseconds]
 			await this.fns.set(
 				this.expiryKey(key), // The name of the key.
 				expiresAt, // The value - the time at which the key expires.
@@ -163,7 +163,9 @@ class MemcachedStore implements Store {
 		// Return the total number of hits, as well as the reset timestamp.
 		return {
 			totalHits,
-			resetTime: expiresAt === undefined ? undefined : new Date(expiresAt),
+			// If `expiresAt` is undefined, assume the key expired sometime in between
+			// reading the hits and expiry keys from memcached.
+			resetTime: expiresAt ? new Date(expiresAt) : new Date(),
 		}
 	}
 
