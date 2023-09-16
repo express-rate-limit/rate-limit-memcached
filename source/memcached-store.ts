@@ -78,15 +78,15 @@ class MemcachedStore implements Store {
 	}
 
 	/**
-	 * Method to suffix the keys with `__expiry`, which is the name of the key used
-	 * to store the reset timestamp for that key.
+	 * Method that returns the name of the key used to store the reset timestamp
+	 * for the given key.
 	 *
 	 * @param key {string} - The key.
 	 *
-	 * @returns {string} - The key + '__expiry'.
+	 * @returns {string} - The expiry key's name.
 	 */
-	expirySuffix(key: string): string {
-		return `${key}__expiry`
+	expiryKey(key: string): string {
+		return `${this.prefix}expiry:${key}`
 	}
 
 	/**
@@ -118,13 +118,13 @@ class MemcachedStore implements Store {
 			// Also store the expiration time in a separate key.
 			expiresAt = Date.now() + this.expiration
 			await setKey(
-				this.expirySuffix(prefixedKey), // The name of the key.
+				this.expiryKey(key), // The name of the key.
 				expiresAt, // The value - the time at which the key expires.
 				this.expiration, // The key should be deleted by memcached after `window` seconds.
 			)
 		} else {
 			// If the key exists and has been incremented succesfully, retrieve its expiry.
-			expiresAt = (await getKey(this.expirySuffix(prefixedKey))) as number
+			expiresAt = (await getKey(this.expiryKey(key))) as number
 		}
 
 		if (typeof totalHits !== 'number')
@@ -163,7 +163,7 @@ class MemcachedStore implements Store {
 
 		// Delete the the key, as well as its expiration counterpart.
 		await deleteKey(prefixedKey)
-		await deleteKey(this.expirySuffix(prefixedKey))
+		await deleteKey(this.expiryKey(key))
 	}
 }
 
