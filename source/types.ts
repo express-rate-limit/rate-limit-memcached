@@ -7,16 +7,12 @@ import type Memcached from 'memcached'
  * A memcached client.
  */
 export type MemcachedClient = {
-	get: (key: string, callback: (error: any, data: any) => void) => void
-	set: (
-		key: string,
-		value: any,
-		time: number,
-		callback: (error: any) => void,
-	) => void
-	del: (key: string, callback: (error: any) => void) => void
-	incr: (key: string, amount: number, callback: (error: any) => void) => void
-	decr: (key: string, amount: number, callback: (error: any) => void) => void
+	get: (key: string, cb: (error: any, data: any) => void) => void
+	set: (key: string, value: any, time: number, cb: (error: any) => void) => void
+	add: (key: string, value: any, time: number, cb: (error: any) => void) => void
+	del: (key: string, cb: (error: any) => void) => void
+	incr: (key: string, amount: number, cb: (error: any) => void) => void
+	decr: (key: string, amount: number, cb: (error: any) => void) => void
 }
 
 /**

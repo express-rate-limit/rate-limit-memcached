@@ -10,13 +10,35 @@ import type {
 import Memcached from 'memcached'
 import type { Options, MemcachedClient } from './types'
 
+// A list of methods that should be present on a client object.
+const methods: Array<keyof MemcachedClient> = [
+	'del',
+	'get',
+	'set',
+	'add',
+	'incr',
+	'decr',
+]
+
+/**
+ * The promisifed version of the `MemcachedClient`.
+ */
+type PromisifiedMemcachedClient = {
+	get: <T>(key: string) => Promise<T>
+	set: (key: string, value: any, time: number) => Promise<boolean>
+	add: (key: string, value: any, time: number) => Promise<boolean>
+	del: (key: string) => Promise<boolean>
+	incr: (key: string, amount: number) => Promise<boolean | number>
+	decr: (key: string, amount: number) => Promise<boolean | number>
+}
+
 /**
  * A `Store` for the `express-rate-limit` package that stores hit counts in
  * Memcached.
  */
 class MemcachedStore implements Store {
 	/**
-	 * The number of milliseconds to remember that user's requests.
+	 * The number of seconds to remember a client's requests.
 	 */
 	expiration!: number
 
@@ -31,6 +53,11 @@ class MemcachedStore implements Store {
 	client!: MemcachedClient
 
 	/**
+	 * The promisifed functions from the `client` object.
+	 */
+	fns!: PromisifiedMemcachedClient
+
+	/**
 	 * @constructor for `MemcachedStore`.
 	 *
 	 * @param options {Options} - The options used to configure the store's behaviour.
@@ -39,20 +66,26 @@ class MemcachedStore implements Store {
 		this.prefix = options?.prefix ?? 'rl:'
 
 		if (options?.client) {
-			if (
-				typeof options.client.get === 'function' &&
-				typeof options.client.set === 'function' &&
-				typeof options.client.del === 'function' &&
-				typeof options.client.incr === 'function' &&
-				typeof options.client.decr === 'function'
-			)
-				this.client = options.client
-			else throw new Error('An invalid memcached client was passed to store.')
-		} else
+			for (const func of methods) {
+				if (typeof options.client[func] !== 'function')
+					throw new Error('An invalid memcached client was passed to store.')
+			}
+
+			this.client = options.client
+		} else {
 			this.client = new Memcached(
 				options?.locations ?? ['localhost:11211'],
 				options?.config ?? {},
 			)
+		}
+
+		// Promisify the functions.
+		// @ts-expect-error This line simply initialises the object, calm down lol.
+		this.fns = {}
+		for (const func of methods) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			this.fns[func] = promisify(this.client[func]).bind(this.client)
+		}
 	}
 
 	/**
@@ -98,33 +131,28 @@ class MemcachedStore implements Store {
 	 */
 	async increment(key: string): Promise<IncrementResponse> {
 		const prefixedKey = this.prefixKey(key)
-		const getKey = promisify(this.client.get).bind(this.client)
-		const setKey = promisify(this.client.set).bind(this.client)
-		const incrementKey = promisify(this.client.incr).bind(this.client)
 
 		// Try incrementing the given key. If the key exists, it will increment it
 		// and return the updated hit count.
-		// @ts-expect-error `incrementKey` returns a number or a boolean, not void.
-		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-		let totalHits = (await incrementKey(prefixedKey, 1)) as number | boolean
+		let totalHits = await this.fns.incr(prefixedKey, 1)
 		let expiresAt
 
 		if (totalHits === false) {
 			// The increment command failed since the key does not exist. In which case, set the
 			// hit count for that key to 1, and make sure it expires after `window` seconds.
-			await setKey(prefixedKey, 1, this.expiration)
+			await this.fns.set(prefixedKey, 1, this.expiration)
 			totalHits = 1 // When you set it to 1, it returns `true` for some reason.
 
 			// Also store the expiration time in a separate key.
 			expiresAt = Date.now() + this.expiration
-			await setKey(
+			await this.fns.set(
 				this.expiryKey(key), // The name of the key.
 				expiresAt, // The value - the time at which the key expires.
 				this.expiration, // The key should be deleted by memcached after `window` seconds.
 			)
 		} else {
 			// If the key exists and has been incremented succesfully, retrieve its expiry.
-			expiresAt = (await getKey(this.expiryKey(key))) as number
+			expiresAt = await this.fns.get<number>(this.expiryKey(key))
 		}
 
 		if (typeof totalHits !== 'number')
@@ -145,11 +173,8 @@ class MemcachedStore implements Store {
 	 * @param key {string} - The identifier for a client
 	 */
 	async decrement(key: string): Promise<void> {
-		const prefixedKey = this.prefixKey(key)
-		const decrementKey = promisify(this.client.decr).bind(this.client)
-
 		// Decrement the key, and do nothing if it doesn't exist.
-		await decrementKey(prefixedKey, 1)
+		await this.fns.decr(this.prefixKey(key), 1)
 	}
 
 	/**
@@ -158,12 +183,9 @@ class MemcachedStore implements Store {
 	 * @param key {string} - The identifier for a client.
 	 */
 	async resetKey(key: string): Promise<void> {
-		const prefixedKey = this.prefixKey(key)
-		const deleteKey = promisify(this.client.del).bind(this.client)
-
 		// Delete the the key, as well as its expiration counterpart.
-		await deleteKey(prefixedKey)
-		await deleteKey(this.expiryKey(key))
+		await this.fns.del(this.prefixKey(key))
+		await this.fns.del(this.expiryKey(key))
 	}
 }
 
