@@ -25,8 +25,8 @@ const methods: Array<keyof MemcachedClient> = [
  */
 type PromisifiedMemcachedClient = {
 	get: <T>(key: string) => Promise<T | undefined>
-	set: (key: string, value: any, time: number) => Promise<boolean | undefined>
-	add: (key: string, value: any, time: number) => Promise<boolean | undefined>
+	set: (key: string, value: any, time: number) => Promise<void>
+	add: (key: string, value: any, time: number) => Promise<void>
 	del: (key: string) => Promise<boolean | undefined>
 	incr: (key: string, amount: number) => Promise<boolean | number>
 	decr: (key: string, amount: number) => Promise<boolean | number>
@@ -138,16 +138,11 @@ class MemcachedStore implements Store {
 		let expiresAt
 
 		if (totalHits === false) {
-			// The increment command failed since the key does not exist. In which case, set the
-			// hit count for that key to 1, and make sure it expires after `window` seconds.
-			const response = await this.fns.add(prefixedKey, 1, this.expiration)
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
-			if (response === undefined || response === false) {
-				// The key was created sometime in between, call `increment` again.
-				totalHits = await this.fns.incr(prefixedKey, 1)
-				// Then fetch its expiry time.
-				expiresAt = await this.fns.get<number>(this.expiryKey(key))
-			} else {
+			try {
+				// The increment command failed since the key does not exist. In which case, set the
+				// hit count for that key to 1, and make sure it expires after `window` seconds.
+				await this.fns.add(prefixedKey, 1, this.expiration)
+
 				// If it is added successfully, set `totalHits` to 1.
 				totalHits = 1
 
@@ -158,6 +153,19 @@ class MemcachedStore implements Store {
 					expiresAt, // The value - the time at which the key expires.
 					this.expiration, // The key should be deleted by memcached after `window` seconds.
 				)
+			} catch (caughtError: any) {
+				const error = caughtError as Error
+
+				// If the `add` operation fails because the key already exists, it was
+				// created sometime in between, call `increment` again, and fetch its
+				// expiry time.
+				if (/not(\s)?stored/i.test(error.message)) {
+					totalHits = await this.fns.incr(prefixedKey, 1)
+					expiresAt = await this.fns.get<number>(this.expiryKey(key))
+				} else {
+					// Otherwise, throw the error.
+					throw error
+				}
 			}
 		} else {
 			// If the key exists and has been incremented succesfully, retrieve its expiry.

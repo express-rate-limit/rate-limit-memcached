@@ -60,6 +60,21 @@ it('should work when `increment` is called for existing key', async () => {
 	expect(data.resetTime instanceof Date).toBe(true)
 })
 
+it('should count all hits when `increment` is called simultaneously', async () => {
+	const store = await getStore()
+
+	await Promise.all([
+		store.increment('1.2.3.4'),
+		store.increment('1.2.3.4'),
+		store.increment('1.2.3.4'),
+	])
+
+	const data = await store.increment('1.2.3.4')
+
+	expect(data.totalHits).toBe(4)
+	expect(data.resetTime instanceof Date).toBe(true)
+})
+
 it('should still call `decr` when `decrement` is called for non-existent key', async () => {
 	const store = await getStore()
 
