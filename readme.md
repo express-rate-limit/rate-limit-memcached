@@ -94,8 +94,7 @@ to it.
 ### `locations`
 
 A list of memcached servers to store the keys in, passed to the default
-Memcached client created by calling
-[`new Memcached()`](https://github.com/3rd-Eden/memcached).
+Memcached client.
 
 Note that the default client is only used if an alternative `client` is not
 passed to the store.
