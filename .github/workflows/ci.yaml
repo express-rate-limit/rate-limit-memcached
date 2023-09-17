@@ -1,0 +1,73 @@
+# /.github/workflows/ci.yaml
+# GitHub actions workflow
+
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    name: Lint
+    strategy:
+      matrix:
+        node-version: [lts/*]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+      - name: Use Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Lint code
+        run: |
+          npm ci
+          npm run lint
+  test:
+    name: Test
+    strategy:
+      matrix:
+        node-version: [lts/gallium, lts/*, latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+      - name: Use Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Run tests
+        run: |
+          npm ci
+          npm run test:lib
+  publish:
+    name: Publish
+    needs: [lint, test]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org/
+      - name: Install dependencies
+        run: npm ci
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Build package to upload to GitHub releases
+        run: |
+          npm pack
+          mv rate-limit-memcached-*.tgz rate-limit-memcached.tgz
+      - name: Create a Github release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: rate-limit-memcached.tgz
+          body:
+            You can view the changelog
+            [here](https://github.com/express-rate-limit/rate-limit-memcached/blob/main/changelog.md).

@@ -1,0 +1,20 @@
+# /.editorconfig
+# Tells most editors what our style preferences are
+# https://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 80
+indent_size = tab
+tab_width = 2
+
+[*.{ts,json,md}]
+indent_style = tab
+
+[*.yaml]
+indent_style = spaces
