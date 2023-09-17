@@ -1,6 +1,6 @@
 {
   "name": "rate-limit-memcached",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "A memcached store for the express-rate-limit middleware.",
   "author": "linyows",
   "license": "MIT",
