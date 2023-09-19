@@ -1,4 +1,4 @@
-# <div align="center"> Express Rate Limit - Memcached Store </div>
+# <div align="center"> `rate-limit-memcached` </div>
 
 <div align="center">
 
@@ -6,8 +6,8 @@
 [![npm version](https://img.shields.io/npm/v/rate-limit-memcached.svg)](https://npmjs.org/package/rate-limit-memcached 'View this project on NPM')
 [![npm downloads](https://img.shields.io/npm/dm/rate-limit-memcached)](https://www.npmjs.com/package/rate-limit-memcached)
 
-A [memcached](https://memcached.org) store for the
-[express-rate-limit](https://github.com/express-rate-limit/express-rate-limit)
+A [`memcached`](https://memcached.org) store for the
+[`express-rate-limit`](https://github.com/express-rate-limit/express-rate-limit)
 middleware.
 
 </div>
