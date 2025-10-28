@@ -8,7 +8,7 @@ import type {
 	IncrementResponse,
 } from 'express-rate-limit'
 import Memcached from 'memcached'
-import type { Options, MemcachedClient } from './types'
+import type { Options, MemcachedClient } from './types.js'
 
 // A list of methods that should be present on a client object.
 const methods: Array<keyof MemcachedClient> = [
@@ -66,8 +66,8 @@ class MemcachedStore implements Store {
 		this.prefix = options?.prefix ?? 'rl:'
 
 		if (options?.client) {
-			for (const func of methods) {
-				if (typeof options.client[func] !== 'function')
+			for (const function_ of methods) {
+				if (typeof options.client[function_] !== 'function')
 					throw new Error('An invalid memcached client was passed to store.')
 			}
 
@@ -82,9 +82,9 @@ class MemcachedStore implements Store {
 		// Promisify the functions.
 		// @ts-expect-error This line simply initialises the object, calm down lol.
 		this.fns = {}
-		for (const func of methods) {
+		for (const function_ of methods) {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			this.fns[func] = promisify(this.client[func]).bind(this.client)
+			this.fns[function_] = promisify(this.client[function_]).bind(this.client)
 		}
 	}
 
