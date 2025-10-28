@@ -14,7 +14,7 @@ const getStore = async (): Promise<MemcachedStore> => {
 	await new Promise<void>((resolve, reject) => {
 		client.flush((error) => {
 			if (error) {
-				reject(error)
+				reject(error as Error)
 				return
 			}
 
