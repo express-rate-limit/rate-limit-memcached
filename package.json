@@ -63,7 +63,7 @@
     "@express-rate-limit/tsconfig": "1.0.2",
     "@jest/globals": "30.2.0",
     "@types/jest": "30.0.0",
-    "@types/node": "24.9.2",
+    "@types/node": "25.9.2",
     "cross-env": "10.1.0",
     "del-cli": "7.0.0",
     "eslint-config-prettier": "10.1.8",
