@@ -5,7 +5,7 @@ import MockMemcached from 'memcached-mock'
 import DefaultMemcached from 'memcached'
 import { it, expect } from '@jest/globals'
 import { MemcachedStore } from '../source/index.js'
-import './types.js' // eslint-disable-line import/no-unassigned-import
+import './types.d.js' // eslint-disable-line import/no-unassigned-import
 
 it('should set default values when no arguments are passed to constructor', () => {
 	const options = {}

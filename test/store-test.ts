@@ -4,7 +4,7 @@
 import Memcached from 'memcached-mock'
 import { it, expect, jest } from '@jest/globals'
 import { MemcachedStore } from '../source/index.js'
-import './types.js' // eslint-disable-line import/no-unassigned-import
+import './types.d.js' // eslint-disable-line import/no-unassigned-import
 
 // Return the same spied-on instance of the store for the tests.
 const getStore = async (): Promise<MemcachedStore> => {
@@ -12,9 +12,9 @@ const getStore = async (): Promise<MemcachedStore> => {
 	// the previous test carries over unless we call flush here.
 	const client = new Memcached('localhost:11211')
 	await new Promise<void>((resolve, reject) => {
-		client.flush((error) => {
+		client.flush((error?: Error) => {
 			if (error) {
-				reject(error as Error)
+				reject(error)
 				return
 			}
 
