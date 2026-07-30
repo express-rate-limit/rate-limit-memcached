@@ -43,12 +43,8 @@
     "clean": "del-cli dist/ coverage/ *.log *.tmp *.bak *.tgz",
     "build": "pkgroll --target=es2020 --src source/",
     "compile": "run-s clean build",
-    "lint:code": "xo",
-    "lint:rest": "prettier --check .",
-    "lint": "run-s lint:*",
-    "format:code": "xo --fix",
-    "format:rest": "prettier --write .",
-    "format": "run-s format:*",
+    "lint": "xo",
+    "format": "xo --fix",
     "test:lib": "jest",
     "test": "run-s lint test:lib",
     "pre-commit": "lint-staged",
@@ -78,13 +74,16 @@
     "ts-node": "10.9.2",
     "tsx": "4.23.1",
     "typescript": "6.0.3",
-    "xo": "0.60.0"
+    "xo": "4.0.0"
   },
   "peerDependencies": {
     "express-rate-limit": ">= 6"
   },
   "xo": {
-    "prettier": true
+    "prettier": true,
+    "rules": {
+      "require-unicode-regexp": "off"
+    }
   },
   "prettier": "@express-rate-limit/prettier",
   "lint-staged": {
