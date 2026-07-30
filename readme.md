@@ -42,8 +42,8 @@ Replace `{version}` with the version of the package that you want to your, e.g.:
 An example of its usage is as follows:
 
 ```ts
-import {rateLimit} from 'express-rate-limit';
-import {MemcachedStore} from 'rate-limit-memcached';
+import { rateLimit } from 'express-rate-limit'
+import { MemcachedStore } from 'rate-limit-memcached'
 
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes.
@@ -54,10 +54,10 @@ const limiter = rateLimit({
 		// prefix: 'rl:', // The prefix attached to all keys stored in the cache.
 		locations: ['localhost:11211'], // The server location(s), passed directly to Memcached.
 	}),
-});
+})
 
 // Apply the rate limiting middleware to all requests
-app.use(limiter);
+app.use(limiter)
 ```
 
 ## Configuration

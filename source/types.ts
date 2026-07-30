@@ -1,29 +1,29 @@
 // /source/types.ts
 // The type definitions for this package.
 
-import type Memcached from 'memcached';
+import type Memcached from 'memcached'
 
 /**
  A memcached client.
  */
 export type MemcachedClient = {
-	get: (key: string, callback: (error: any, data: any) => void) => void;
+	get: (key: string, callback: (error: any, data: any) => void) => void
 	set: (
 		key: string,
 		value: any,
 		time: number,
 		callback: (error: any) => void,
-	) => void;
+	) => void
 	add: (
 		key: string,
 		value: any,
 		time: number,
 		callback: (error: any) => void,
-	) => void;
-	del: (key: string, callback: (error: any) => void) => void;
-	incr: (key: string, amount: number, callback: (error: any) => void) => void;
-	decr: (key: string, amount: number, callback: (error: any) => void) => void;
-};
+	) => void
+	del: (key: string, callback: (error: any) => void) => void
+	incr: (key: string, amount: number, callback: (error: any) => void) => void
+	decr: (key: string, amount: number, callback: (error: any) => void) => void
+}
 
 /**
  The configuration options for the store.
@@ -32,12 +32,12 @@ export type Options = {
 	/**
 	 The text to prepend to the key.
 	 */
-	prefix: string;
+	prefix: string
 
 	/**
 	 The `memcached` client to use.
 	 */
-	client: MemcachedClient;
+	client: MemcachedClient
 
 	/**
 	 A list of memcached server URLs to store the keys in, passed to the default
@@ -46,10 +46,10 @@ export type Options = {
 	 Note that the default client is only used if another client is not passed
 	 to the store.
 	 */
-	locations: string[];
+	locations: string[]
 
 	/**
 	 The configuration to pass to the default client, along with the `locations`.
 	 */
-	config: Memcached.options;
-};
+	config: Memcached.options
+}

@@ -157,7 +157,7 @@ If there are changes made to the `next` branch of the
 `express-rate-limit/rate-limit-memcached` repository, you may wish to merge
 those changes into your branch. To do so, you can run the following commands:
 
-```
+```sh
 > git fetch upstream next
 > git merge upstream/next
 ```

@@ -4,11 +4,11 @@
 declare module 'memcached-mock' {
 	// Moving the import INSIDE the declaration prevents the file
 	// from becoming a local module, making this an ambient declaration instead.
-	import Memcached from 'memcached';
+	import Memcached from 'memcached'
 
 	class MemcachedMock extends Memcached {
-		constructor(server: string | string[], options?: Memcached.options);
+		constructor(server: string | string[], options?: Memcached.options)
 	}
 
-	export default MemcachedMock;
+	export default MemcachedMock
 }
