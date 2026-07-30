@@ -162,7 +162,7 @@ class MemcachedStore implements Store {
 				// If the `add` operation fails because the key already exists, it was
 				// created sometime in between, call `increment` again, and fetch its
 				// expiry time.
-				if (/not\s?stored/iv.test(error.message)) {
+				if (/not\s?stored/i.test(error.message)) {
 					totalHits = await this.fns.incr(prefixedKey, 1);
 					expiresAt = await this.fns.get<number>(this.expiryKey(key));
 				} else {
@@ -171,7 +171,7 @@ class MemcachedStore implements Store {
 				}
 			}
 		} else {
-			// If the key exists and has been incremented succesfully, retrieve its expiry.
+			// If the key exists and has been incremented successfully, retrieve its expiry.
 			expiresAt = await this.fns.get<number>(this.expiryKey(key));
 		}
 

@@ -80,7 +80,10 @@
     "express-rate-limit": ">= 6"
   },
   "xo": {
-    "prettier": true
+    "prettier": true,
+    "rules": {
+      "require-unicode-regexp": "off"
+    }
   },
   "prettier": "@express-rate-limit/prettier",
   "lint-staged": {
