@@ -2,16 +2,10 @@
   "name": "rate-limit-memcached",
   "version": "1.0.1",
   "description": "A memcached store for the express-rate-limit middleware.",
-  "author": "linyows",
   "license": "MIT",
-  "homepage": "https://github.com/express-rate-limit/rate-limit-memcached",
   "repository": "express-rate-limit/rate-limit-memcached",
-  "keywords": [
-    "express",
-    "api",
-    "memcached",
-    "rate-limit"
-  ],
+  "homepage": "https://github.com/express-rate-limit/rate-limit-memcached",
+  "author": "linyows",
   "type": "module",
   "exports": {
     ".": {
@@ -28,14 +22,6 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": [
-    "dist/",
-    "tsconfig.json",
-    "package.json",
-    "readme.md",
-    "license.md",
-    "changelog.md"
-  ],
   "engines": {
     "node": ">= 16"
   },
@@ -50,6 +36,17 @@
     "pre-commit": "lint-staged",
     "prepare": "run-s compile && husky install config/husky"
   },
+  "files": [
+    "changelog.md",
+    "dist/",
+    "tsconfig.json"
+  ],
+  "keywords": [
+    "express",
+    "api",
+    "memcached",
+    "rate-limit"
+  ],
   "dependencies": {
     "@types/memcached": "2.2.10",
     "memcached": "2.2.2"
@@ -74,17 +71,33 @@
     "ts-node": "10.9.2",
     "tsx": "4.23.15",
     "typescript": "6.0.3",
-    "xo": "4.0.0"
+    "xo": "5.0.1"
   },
   "peerDependencies": {
     "express-rate-limit": ">= 6"
   },
-  "xo": {
-    "prettier": true,
-    "rules": {
-      "require-unicode-regexp": "off"
+  "xo": [
+    {
+      "prettier": true,
+      "rules": {
+        "node-test/no-import-test-files": "off",
+        "require-unicode-regexp": "off"
+      }
+    },
+    {
+      "files": [
+        "**/package.json"
+      ],
+      "rules": {
+        "package-json/dependency-version-range": "off",
+        "package-json/peer-dependencies-as-dev-dependencies": "off",
+        "package-json/prefer-exports": "off",
+        "package-json/prefer-side-effects-field": "off",
+        "package-json/require-default-condition": "off",
+        "package-json/require-types-in-exports": "off"
+      }
     }
-  },
+  ],
   "prettier": "@express-rate-limit/prettier",
   "lint-staged": {
     "{source,test}/**/*.ts": "xo --fix",
