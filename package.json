@@ -56,7 +56,7 @@
     "@express-rate-limit/tsconfig": "1.0.5",
     "@jest/globals": "30.5.2",
     "@types/jest": "30.0.0",
-    "@types/node": "26.6.3",
+    "@types/node": "26.6.4",
     "cross-env": "10.1.0",
     "del-cli": "7.0.0",
     "eslint-config-prettier": "10.1.8",
