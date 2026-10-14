@@ -58,7 +58,7 @@
     "@types/jest": "30.0.0",
     "@types/node": "26.6.5",
     "cross-env": "10.1.0",
-    "del-cli": "7.0.0",
+    "del-cli": "8.0.1",
     "eslint-config-prettier": "10.1.8",
     "husky": "9.1.7",
     "jest": "30.5.2",
